@@ -1,9 +1,11 @@
 # pole-tracking-script
 For Vogel Lab. Tracks poles and measures features of proteins near poles.
+
 Instructions on Use:
 July 4, 2017
 
 Download the “Tracking Script” folder and all its contents onto your desktop. Inside this Tracking Script folder is the macro for Fiji, all of the python scripts called by Fiji, and the Jupyter notebook for data manipulation. Drag and drop the “Run This.ijm” macro file into Fiji and run. Only select “Mean Grey value” when it asks you what you’d like to measure. Open “Python Data Manipulation.ipynb” as a Jupyter notebook*. Note that some hardcoding is required throughout, as marked as the start of a hardcoding cell with “#HARDCODED!” and explained with comments. Thus, it is recommended that you run this program cell-by-cell by clicking ‘Shift-Enter’ on each cell, one at a time. Please ensure that after you have run all codes for a single cell that you close the “ROI Manager” window that pops up during the Fiji script before beginning your analysis on the next cell. If you have created a folder just for your cell, after running all scripts you will be left with:
+
 	1. The cropped image of your cell
 	2. The raw coordinates and mean intensity of the poles in a “coordinates” file
 	3. The raw measurements on the GFP channel in a “results” file
@@ -14,6 +16,7 @@ Download the “Tracking Script” folder and all its contents onto your desktop
 
 
 Overview of what each script does:
+
 	“Run This.ijm” - Leads user through selecting image, cropping image, saving cropped image in a 	folder of their choosing (as well as all addition files associated with this cell). Calls Jython scripts 	to track on this cropped image.
 
 	“Part_1.py” - Runs Trackmate on the cell using its Simple LAP tracker, and saves required raw data for further manipulation as a “coordinates” file
