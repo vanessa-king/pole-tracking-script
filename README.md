@@ -12,7 +12,6 @@ Download the “Tracking Script” folder and all its contents onto your desktop
 	4. An “Old Pole Data” file that has sorted the raw data and includes only the tracks manually chosen as old.
 	5. A “New Pole Data” file that has sorted the raw data and includes only the tracks manually chosen as new.
 	6. A “Pole Distance Data” file that has the distance between your two poles
-	7. A “Pole Symmetry Index” file that has the symmetry index of GFP on each pole over time.
 
 
 Overview of what each script does:
