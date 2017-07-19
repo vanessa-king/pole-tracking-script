@@ -55,12 +55,15 @@ import fiji.plugin.trackmate.features.track.TrackAnalyzer
 
 #1. 
 # Open data
-imp = IJ.openImage(getArgument())
+the_input = getArgument()
+the_list = the_input.rpartition(" ")
+image = the_list[0]
+threshold = float(the_list[2])
+
+imp = IJ.openImage(image)
 imp.show()
 
 #2.
-#changing image properties before running trackmate
-IJ.run(imp, "Properties...", "channels=2 slices=1 frames=300 unit=pixel pixel_width=1.000 pixel_height=1.000 voxel_depth=1.00 frame=[1.00 sec]");
 model = Model()
 model.setLogger(Logger.IJ_LOGGER)
 settings = Settings()
@@ -71,32 +74,29 @@ settings.setFrom(imp)
 settings.detectorFactory = DogDetectorFactory()
 settings.detectorSettings = { 
     'DO_SUBPIXEL_LOCALIZATION' : True,
-    'RADIUS' : 2.000,
+    'RADIUS' : 0.350,
     'TARGET_CHANNEL' : 1,
-    'THRESHOLD' : 100.0,
+    'THRESHOLD' : 0.0,
     'DO_MEDIAN_FILTERING' : True,
 }  
 
 #4. 
 # Configure spot filters
-#Note: additional spot filters non-functional
-filter1 = FeatureFilter('QUALITY', 400.00, True)
-settings.addSpotFilter(filter1)
-#filter2 = FeatureFilter('MEAN_INTENSITY', 2060.0, True)
-#settings.addSpotFilter(filter2)
+filter2 = FeatureFilter('MEAN_INTENSITY', threshold-300, True)
+settings.addSpotFilter(filter2)
 
 # Configure tracker
 settings.trackerFactory = SparseLAPTrackerFactory()
 settings.trackerSettings = LAPUtils.getDefaultLAPSettingsMap()
 #settings.trackerSettings['ALLOW_TRACK_SPLITTING'] = True
-settings.trackerSettings['LINKING_MAX_DISTANCE'] = 13.000
-settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = 30.000
-settings.trackerSettings['MAX_FRAME_GAP'] = 4
+settings.trackerSettings['LINKING_MAX_DISTANCE'] = 1.000
+settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = 1.000
+settings.trackerSettings['MAX_FRAME_GAP'] = 3
 # Configure track analyzers
 settings.addTrackAnalyzer(TrackDurationAnalyzer())
 settings.addTrackAnalyzer(TrackBranchingAnalyzer())
 # Configure track filters
-filter3 = FeatureFilter('TRACK_DURATION', 40,  True)
+filter3 = FeatureFilter('TRACK_DURATION', 100,  True)
 settings.addTrackFilter(filter3)
 
 settings.addSpotAnalyzerFactory(SpotIntensityAnalyzerFactory())
@@ -117,8 +117,6 @@ selectionModel = SelectionModel(model)
 displayer =  HyperStackDisplayer(model, selectionModel, imp)
 displayer.render()
 displayer.refresh()
-# Echo results with the logger we set at start:
-#model.getLogger().log(str(model))
 
 #6.
 #get spot and track features
@@ -128,9 +126,6 @@ for id in model.getTrackModel().trackIDs(True):
     # Fetch the track feature from the feature model.
     v = fm.getTrackFeature(id, 'TRACK_MEAN_SPEED')
     model.getLogger().log('0.0,0.0,0.0,0.0')
-    #removed the following line as to not have a string in my array
-    #model.getLogger().log('Track ' + str(id) + ': mean velocity = ' + str(v) + ' ' + model.getSpaceUnits() + '/' + model.getTimeUnits())
-
     track = model.getTrackModel().trackSpots(id)
     for spot in track:
         # Fetch spot features directly from spot. 
@@ -145,7 +140,7 @@ for id in model.getTrackModel().trackIDs(True):
 #7.
 #saving log as a txt file on desktop, then reading txt and rewriting as csv.
 IJ.selectWindow("Log")
-given = getArgument()
-filename = given.replace(".tif", "")
+badname = image
+filename = badname.replace(".tif", "")
 IJ.saveAs("Text", filename+"_coordinates");
 IJ.run("Close");

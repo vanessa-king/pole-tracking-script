@@ -60,12 +60,15 @@ import os
 
 #1.
 # Open data
-imp = IJ.openImage(getArgument())
+the_input = getArgument()
+the_list = the_input.rpartition(" ")
+image = the_list[0]
+imp = IJ.openImage(image)
 imp.show()
+dimensions = float(the_list[2])
 
 #2. Uploading coordinates, converting data from csv to arrays of floats.
-given = getArgument()
-filename = given.replace(".tif", "")
+filename = image.replace(".tif", "")
 raw = csv.reader(open(filename+"_coordinates.txt"), delimiter = ",", quotechar = '|')
 rawdata = list(raw)
 del rawdata [:16]
@@ -76,10 +79,10 @@ for i in range(len(t)):
 	t[i] = float(t[i])
 x = coordinates[1]; 
 for i in range(len(x)):
-	x[i] = float(x[i])
+	x[i] = float(x[i]) * dimensions
 y = coordinates[2];
 for i in range(len(y)):
-	y[i] = float(y[i])
+	y[i] = float(y[i]) * dimensions
 m = coordinates[3];
 for i in range(len(m)):
 	m[i] = float(m[i])
@@ -95,7 +98,7 @@ for i in range(len(t)):
 	if x[i] != 0:
 		#imp.setPosition switches to GFP channel and sets frame for each ROI
 		imp.setPosition(2, 1, int(t[i])+1)
-		#adds an oval ROI centered around coordnates
+		#adds an oval ROI centered around coordinates
 		rm.addRoi(ij.gui.OvalRoi(x[i]-5, y[i]-5, 10, 10))
 		
 #measures requested data on all ROIs

@@ -1,0 +1,30 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww25400\viewh13280\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f0\b\fs24 \cf0 Tracking Script  - Instructions on Use\
+
+\b0 July 19, 2017\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+Download this \'93Tracking Script\'94 folder and all its contents onto your desktop. Inside this Tracking Script folder is the macro for Fiji, all of the python scripts called by Fiji, and the Jupyter notebook for data manipulation. Drag and drop the \'93Run This.ijm\'94 macro file into Fiji and run. Only select \'93Mean Grey value\'94 when it asks you what you\'92d like to measure. Open \'93Python Data Manipulation.ipynb\'94 as a Jupyter notebook*. Note that some hardcoding is required throughout, as marked as the start of a hardcoding cell with \'93#HARDCODED!\'94 and explained with comments. Thus, it is recommended that you run this program cell-by-cell by clicking \'91Shift-Enter\'92 on each cell, one at a time. Please ensure that after you have run all codes for a single cell that you close the \'93ROI Manager\'94 window that pops up during the Fiji script before beginning your analysis on the next cell. If you have created a folder just for your cell, after running all scripts you will be left with:\
+	1. The cropped image of your cell\
+	2. The raw coordinates and mean intensity of the poles in a \'93coordinates\'94 file\
+	3. The raw measurements on the GFP channel in a \'93results\'94 file\
+	4. An \'93Old Pole Data\'94 file that has sorted the raw data and includes only the tracks manually chosen as old.\
+	5. A \'93New Pole Data\'94 file that has sorted the raw data and includes only the tracks manually chosen as new.\
+	6. A \'93Pole Distance Data\'94 file that has the distance between your two poles\
+\
+Overview of what each script does:\
+	\'93Run This.ijm\'94 - Leads user through selecting image, cropping image, saving cropped image in a 	folder of their choosing (as well as all addition files associated with this cell). Calls Jython scripts 	to track on this cropped image.\
+\
+	\'93Part_1.py\'94 - Runs Trackmate on the cell using its Simple LAP tracker, and saves required raw data for further manipulation as a \'93coordinates\'94 file\
+\
+	\'93Part_2.py\'94 - Upload coordinates, saves them as ROIs, and uses Fiji\'92s \'91Measure\'92 feature to 	measure mean intensity of the pole. Records in a \'93results\'94 file\
+\
+	\'93Python Data Manipulation.ipynb\'94  - sorts and edits data until it is parseable. Calculates 	distance between poles. Provides a diagnostic figure so that the user can understand which object is associated to which track. Saves an \'93Old Pole Data\'94, \'93New Pole Data\'94, and \'93Pole Distance Data\'94 file. \
+\
+\
+*Note: This requires running a Python (2.7) script on a Jupyter notebook. If you don\'92t already have access to Jupyter, download \'93Anaconda Python 2.7\'94 from {\field{\*\fldinst{HYPERLINK "https://www.continuum.io/downloads"}}{\fldrslt https://www.continuum.io/downloads}}. When you open Anaconda, it will give you several options of \'93My Applications\'94 with which you can run Python code. Select Jupyter Notebook. This will open Jupyter\'92s \'93home\'94 directory page where you can find the Python script from this folder and select it to open.}
