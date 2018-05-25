@@ -71,7 +71,7 @@ dimensions = float(the_list[2])
 filename = image.replace(".tif", "")
 raw = csv.reader(open(filename+"_coordinates.txt"), delimiter = ",", quotechar = '|')
 rawdata = list(raw)
-del rawdata [:16]
+del rawdata [:17]
 coordinates = [0 for index in range(0,4)]
 coordinates = [[row[i] for row in rawdata] for i in range(len(rawdata[0]))]
 t = coordinates[0]; 
