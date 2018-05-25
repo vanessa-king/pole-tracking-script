@@ -44,7 +44,7 @@ import fiji.plugin.trackmate.features.track.TrackAnalyzer
 
 #Script Part 1B
 #Outline:
-#1. Open data
+#1. Open data and run stunted Trackmate to determine auto quality number
 #2. Set Image properties
 #3. Configure detector
 #4. Configure spot filters
@@ -53,21 +53,57 @@ import fiji.plugin.trackmate.features.track.TrackAnalyzer
 #7. Get spot or track features
 #8. Save log as a parsable data set
 
-#1. 
-# Open data
+
+#1.
+#Opening data and determing auto quality number
+
 the_input = getArgument()
 the_list = the_input.rpartition(" ")
 image = the_list[0]
-threshold = float(the_list[2])
-
 imp = IJ.openImage(image)
 imp.show()
+subtraction = float(the_list[2])
+
+
+
+model = Model()
+settings = Settings()
+settings.setFrom(imp)
+settings.detectorFactory = DogDetectorFactory()
+settings.detectorSettings = { 
+    'DO_SUBPIXEL_LOCALIZATION' : True,
+    'RADIUS' : 0.350,
+    'TARGET_CHANNEL' : 1,
+    'THRESHOLD' : 0.0,
+    'DO_MEDIAN_FILTERING' : True,
+}  
+settings.addSpotAnalyzerFactory(SpotIntensityAnalyzerFactory())
+settings.trackerSettings['LINKING_MAX_DISTANCE'] = 1.000
+settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = 1.000
+settings.trackerSettings['MAX_FRAME_GAP'] = 3
+
+#Running specific trackmate tasks
+trackmate = TrackMate(model, settings)
+trackmate.setNumThreads(1)
+trackmate.execDetection()
+trackmate.execInitialSpotFiltering()
+trackmate.computeSpotFeatures(False)
+trackmate.execSpotFiltering(False)
+
+#get spot features
+fm = model.getFeatureModel()
+all_spots = model.getSpots()
+quality = all_spots.collectValues('QUALITY', False)
+optimalQuality = fiji.plugin.trackmate.util.TMUtils.otsuThreshold(quality) * subtraction
 
 #2.
+trackmate.setNumThreads(4);
 model = Model()
 model.setLogger(Logger.IJ_LOGGER)
 settings = Settings()
 settings.setFrom(imp)
+stringOptimalQuality = str(optimalQuality)
+model.getLogger().log(stringOptimalQuality)
 
 #3.
 # Configure detector
@@ -82,13 +118,12 @@ settings.detectorSettings = {
 
 #4. 
 # Configure spot filters
-filter2 = FeatureFilter('MEAN_INTENSITY', threshold-300, True)
+filter2 = FeatureFilter('QUALITY', optimalQuality, True)
 settings.addSpotFilter(filter2)
 
 # Configure tracker
 settings.trackerFactory = SparseLAPTrackerFactory()
 settings.trackerSettings = LAPUtils.getDefaultLAPSettingsMap()
-#settings.trackerSettings['ALLOW_TRACK_SPLITTING'] = True
 settings.trackerSettings['LINKING_MAX_DISTANCE'] = 1.000
 settings.trackerSettings['GAP_CLOSING_MAX_DISTANCE'] = 1.000
 settings.trackerSettings['MAX_FRAME_GAP'] = 3
@@ -123,8 +158,6 @@ displayer.refresh()
 # The feature model, that stores edge and track features.
 fm = model.getFeatureModel()
 for id in model.getTrackModel().trackIDs(True):
-    # Fetch the track feature from the feature model.
-    v = fm.getTrackFeature(id, 'TRACK_MEAN_SPEED')
     model.getLogger().log('0.0,0.0,0.0,0.0')
     track = model.getTrackModel().trackSpots(id)
     for spot in track:
@@ -132,15 +165,13 @@ for id in model.getTrackModel().trackIDs(True):
         x=spot.getFeature('POSITION_X')
         y=spot.getFeature('POSITION_Y')
         t=spot.getFeature('FRAME')
-        q=spot.getFeature('QUALITY')
-        snr=spot.getFeature('SNR') 
         mean=spot.getFeature('MEAN_INTENSITY')
         model.getLogger().log(str(t)+','+str(x)+','+str(y)+','+str(mean))
 
 #7.
 #saving log as a txt file on desktop, then reading txt and rewriting as csv.
 IJ.selectWindow("Log")
-badname = image
+badname = image;
 filename = badname.replace(".tif", "")
 IJ.saveAs("Text", filename+"_coordinates");
 IJ.run("Close");
