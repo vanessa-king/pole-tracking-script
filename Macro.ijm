@@ -70,9 +70,7 @@ if (image_type == "nd"){
 myImageID = getImageID();
 
 setTool("rectangle");
-title_5 = "ROI Selection";
-msg_5 = "Please draw rectangle around a cell then click OK.";
-waitForUser(title_5, msg_5);
+waitForUser("ROI Selection", "Please draw rectangle around a cell then click OK");
 selectImage(myImageID);
 if (selectionType() != 0)                           
 exit("You did not draw a rectangle.");
@@ -91,29 +89,27 @@ good_info = split_info[5];
 split_good_info = split(good_info, " ");
 dimensions = split_good_info[0];
 
-run("Split Channels");
-selectWindow("C1-"+cell+".tif");
-run("Auto Threshold", "method=Triangle white show use_stack_histogram");
-raw_threshold = getInfo("log");
-selectWindow("Log");
-run("Close");
-threshold_list = split(raw_threshold);
-threshold = threshold_list[1];
+width = 0.;
+height = 0.;
+channels = 0.;
+slices = 0.;
+frames = 0.;
+getDimensions(width, height, channels, slices, frames);
 
-selectWindow("C1-"+cell+".tif");
+showText("Dimensions ", dimensions+" "+frames);
+saveAs('text', directory+cell+"_dimensions.txt");
+selectWindow(cell+".tif");
 run("Close");
-selectWindow("C2-"+cell+".tif");
+selectWindow(cell+"_dimensions.txt");
 run("Close");
-selectWindow("C3-"+cell+".tif");
-run("Close");
-title_threshold = "Threshold";
-msg_threshold = "Threshold determined for image: "+threshold;
-waitForUser(title_threshold, msg_threshold);
+
+subtraction = getString("What fraction of the quality filter would you like to apply?", "0.50");
+
 
 jythonText_1 = File.openAsString(getDirectory("home") +"Desktop/Tracking Script/Jython Script/Part_1.py");
 jythonText_2 = File.openAsString(getDirectory("home") +"Desktop/Tracking Script/Jython Script/Part_2.py");
 
-call("ij.plugin.Macro_Runner.runPython", jythonText_1, directory+cell+".tif "+threshold);
+call("ij.plugin.Macro_Runner.runPython", jythonText_1, directory+cell+".tif "+subtraction);
 call("ij.plugin.Macro_Runner.runPython", jythonText_2, directory+cell+".tif "+dimensions);
 
 thenewImageID = getImageID();
